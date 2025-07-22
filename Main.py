@@ -14,26 +14,22 @@ from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor  #
 # Please complete the code
 
 # -------------------------------
-# Part 1: Data Generation and Preprocessing
+# Part 1 & 2: Data Generation and Preprocessing
 # -------------------------------
 from data_processing import split_data
 X_train, X_val, X_test, y_train, y_val, y_test = split_data()
 
 # -------------------------------
-# Part 2: Model Training Section
+# Part 3: Model Training Section
 # -------------------------------
-from models.ols import train_ols_model
+
+# --- OLS Model Training and Evaluation ---
+from models.ordinary_least_squares_regression import train_ols_model
 ols_model, y_pred_ols, r2_ols, mse_ols = train_ols_model(X_train, y_train, X_test, y_test)
 
 
-# --- Weighted Linear Regression ---
-   
-
-# --- Huber Regressor ---
-
-
 # --- ElasticNet Model Tuning ---
-           
+
 
 # --- Principal Component Regression (PCR) ---
 
