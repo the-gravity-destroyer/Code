@@ -1,14 +1,3 @@
-import pandas as pd  # Import Pandas for data manipulation
-import tensorflow as tf  # Import TensorFlow for building neural network models
-import seaborn as sns  # Import Seaborn for statistical plotting
-import matplotlib.pyplot as plt  # Import Matplotlib for creating plots
-from sklearn.model_selection import train_test_split  # Import train_test_split for splitting datasets
-from sklearn.metrics import mean_squared_error, r2_score  # Import metrics for evaluating models
-from sklearn.linear_model import LinearRegression, HuberRegressor, ElasticNet  # Import linear regression models
-from sklearn.decomposition import PCA  # Import PCA for dimensionality reduction
-from sklearn.cross_decomposition import PLSRegression  # Import PLSRegression for partial least squares regression
-from sklearn.preprocessing import SplineTransformer  # Import SplineTransformer for spline feature transformation
-from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor  # Import ensemble regression models
 # Problem Set: Multi-Model Financial Prediction and Risk Analysis
 # Student Exercise Manual
 # Please complete the code
@@ -29,16 +18,20 @@ ols_model, y_pred_ols, r2_ols, mse_ols = train_ols_model(X_train, y_train, X_tes
 
 
 # --- ElasticNet Model Tuning ---
-
+from models.elastic_net_regression import train_elastic_net_model
+elastic_net_model, y_pred_en, r2_en, mse_en = train_elastic_net_model(X_train, y_train, X_test, y_test)
 
 # --- Principal Component Regression (PCR) ---
-
+from models.principal_component_regression import train_pcr_model
+pcr = train_pcr_model()
 
 # --- Partial Least Squares Regression (PLS) ---
-
-
+from models.partial_least_squares_regression import train_pls_model
+pls_model, y_pred_pls, r2_pls, mse_pls = train_pls_model(X_train, y_train, X_test, y_test)
 
 # --- Generalized Linear Model (Spline Transformation + ElasticNet) ---
+from models.generalized_linear_model import train_glm_model
+glm_model, y_pred_glm, r2_glm, mse_glm = train_glm_model(X_train, y_train, X_test, y_test)
 
 # --- non-linear models ---
 
