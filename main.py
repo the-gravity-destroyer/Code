@@ -16,7 +16,6 @@ X_train, X_val, X_test, y_train, y_val, y_test = split_data()
 from models.ordinary_least_squares_regression import train_ols_model
 ols_model, y_pred_ols, r2_ols, mse_ols = train_ols_model(X_train, y_train, X_test, y_test)
 
-
 # --- ElasticNet Model Tuning ---
 from models.elastic_net_regression import train_elastic_net_model
 elastic_net_model, y_pred_en, r2_en, mse_en = train_elastic_net_model(X_train, y_train, X_test, y_test)
