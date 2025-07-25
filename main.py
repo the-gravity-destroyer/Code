@@ -8,8 +8,8 @@ from models.linear_models.principal_component_regression import PCRModel
 from models.linear_models.partial_least_squares_regression import PLSModel
 from models.linear_models.generalized_linear_model import GLMModel
 from models.non_linear_models.neural_network import NeuralNetworkModel
-#from models.non_linear_models.gradient_boosting import GradientBoostingModel
-#from models.non_linear_models.random_forest import RandomForestModel
+from models.non_linear_models.gradient_boosting import GradientBoostingModel
+from models.non_linear_models.random_forest import RandomForestModel
 
 from data_processing import split_data
 
@@ -49,13 +49,15 @@ glm.train(X_train, y_train, X_val, y_val)
 # --- Neural Network Model ---
 nn_model = NeuralNetworkModel(n_stocks=10)
 nn_model.train(X_train, y_train, X_val, y_val)
-'''
-
 
 # --- Gradient Boosting Regressor ---
+gradient_boosting_model = GradientBoostingModel(n_stocks=10)
+gradient_boosting_model.train(X_train, y_train, X_val, y_val)
+'''
 
 # --- Random Forest Regressor ---
-
+random_forest_model = RandomForestModel(n_stocks=10)
+random_forest_model.train(X_train, y_train, X_val, y_val)
 
 # -------------------------------
 # Part 4: Prediction Wrappers
@@ -71,6 +73,8 @@ pcr_model.plot_diagnostics(X_test, y_test)
 pls_model.plot_diagnostics(X_test, y_test)
 glm.plot_diagnostics(X_test, y_test)
 nn_model.plot_diagnostics(X_test, y_test)
+gradient_boosting_model.plot_diagnostics(X_test, y_test)
+random_forest_model.plot_diagnostics(X_test, y_test)
 '''
 
 
@@ -113,12 +117,25 @@ test_metrics = glm.evaluate(X_test, y_test)
 glm.print_summary("GLM Test", test_metrics)
 glm.print_feature_importance()
 
-
 nn_model.print_architecture()
 val_metrics = nn_model.evaluate(X_val, y_val)
 nn_model.print_summary("Neural Network Validation", val_metrics)
 test_metrics = nn_model.evaluate(X_test, y_test)
 nn_model.print_summary("Neural Network Test", test_metrics)
+
+gradient_boosting_model.print_hyperparameters()
+val_metrics = gradient_boosting_model.evaluate(X_val, y_val)
+gradient_boosting_model.print_summary("Gradient Boosting Validation", val_metrics)
+test_metrics = gradient_boosting_model.evaluate(X_test, y_test)
+gradient_boosting_model.print_summary("Gradient Boosting Test", test_metrics)
+gradient_boosting_model.print_feature_importance(top_n=10)
+
+val_metrics = random_forest_model.evaluate(X_val, y_val)
+random_forest_model.print_summary("Random Forest Validation", val_metrics)
+test_metrics = random_forest_model.evaluate(X_test, y_test)
+random_forest_model.print_summary("Random Forest Test", test_metrics)
+random_forest_model.print_feature_importance(top_n=10)
+random_forest_model.print_hyperparameters()
 '''
 
 # -------------------------------
