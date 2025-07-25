@@ -2,10 +2,7 @@
 # Student Exercise Manual
 # Please complete the code
 
-from models.ordinary_least_squares_regression import train_ols_model
-from models.elastic_net_regression import train_elastic_net_model
-from models.partial_least_squares_regression import train_pls_model
-from models.generalized_linear_model import train_glm_model
+from models.linear_models import ordinary_least_squares_regression as ols
 
 
 # -------------------------------
@@ -19,20 +16,22 @@ X_train, X_val, X_test, y_train, y_val, y_test = split_data()
 # -------------------------------
 
 # --- OLS Model Training and Evaluation ---
-ols_model, y_pred_ols, r2_ols, mse_ols, r2_zero_ols, r2_cs_ols = train_ols_model(X_train, y_train, X_val, y_val, X_test, y_test, n_stocks=10)
+ols_model = ols.OLSModel(n_stocks=10)
+ols_model.train(X_train, y_train)
+val_metrics = ols_model.evaluate(X_val, y_val)
+ols_model.print_summary("OLS Validation", val_metrics)
+test_metrics = ols_model.evaluate(X_test, y_test)
+ols_model.print_summary("OLS Test", test_metrics)
+ols_model.print_feature_importance(top_n=10)
+ols_model.plot_diagnostics(X_test, y_test)
 
 # --- ElasticNet Model Tuning ---
-best_pipe, y_test_pred, r2_test, mse_test, r2_zero_test, r2_cs = train_elastic_net_model(X_train, y_train, X_val, y_val, X_test, y_test, n_stocks = 10)
 
 # --- Principal Component Regression (PCR) ---
-from models.principal_component_regression import train_pcr_model
-best_pipe, best_k, y_test_pred, r2_test, mse_test, r2_zero_test, r2_cs = train_pcr_model(X_train, y_train, X_val, y_val, X_test, y_test, n_stocks = 10)
 
 # --- Partial Least Squares Regression (PLS) ---
-best_pipe, best_k, y_test_pred, r2_test, mse_test, r2_zero_test, r2_cs = train_pls_model(X_train, y_train, X_val, y_val, X_test, y_test, n_stocks=10)
 
 # --- Generalized Linear Model (Spline Transformation + ElasticNet) ---
-best_pipe, y_test_pred, r2_test, mse_test, r2_zero_test, r2_cs = train_glm_model(X_train, y_train, X_val, y_val, X_test, y_test, n_stocks=10)
 
 # --- non-linear models ---
 
