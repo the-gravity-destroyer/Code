@@ -5,6 +5,9 @@
 from models.linear_models import ordinary_least_squares_regression
 from models.linear_models.elastic_net_regression import ElasticNetModel
 from models.linear_models.principal_component_regression import PCRModel
+from models.linear_models.partial_least_squares_regression import PLSModel
+from models.linear_models.generalized_linear_model import GLMModel
+
 from data_processing import split_data
 
 
@@ -19,7 +22,7 @@ X_train, X_val, X_test, y_train, y_val, y_test = split_data()
 
 # --- OLS Model Training and Evaluation ---
 '''
-ols_model = ordinary_least_squares_regression.OLSModel(n_stocks=10)
+ols_model = OLSModel(n_stocks=10)
 ols_model.train(X_train, y_train)
 val_metrics = ols_model.evaluate(X_val, y_val)
 ols_model.print_summary("OLS Validation", val_metrics)
@@ -38,7 +41,6 @@ test_metrics = elastic_net_model.evaluate(X_test, y_test)
 elastic_net_model.print_summary("ElasticNet Test", test_metrics)
 elastic_net_model.print_feature_importance(top_n=10)
 elastic_net_model.plot_diagnostics(X_test, y_test)
-'''
 
 # --- Principal Component Regression (PCR) ---
 pcr_model = PCRModel(n_stocks=10)
@@ -52,8 +54,28 @@ pcr_model.print_feature_importance(top_n=10)
 pcr_model.plot_diagnostics(X_test, y_test)
 
 # --- Partial Least Squares Regression (PLS) ---
+pls_model = PLSModel(n_stocks=10)
+pls_model.train(X_train, y_train, X_val, y_val)
+pls_model.print_best_k()
+val_metrics = pls_model.evaluate(X_val, y_val)
+pls_model.print_summary("PCR Validation", val_metrics)
+test_metrics = pls_model.evaluate(X_test, y_test)
+pls_model.print_summary("PCR Test", test_metrics)
+pls_model.print_feature_importance(top_n=10)
+pls_model.plot_diagnostics(X_test, y_test)
 
 # --- Generalized Linear Model (Spline Transformation + ElasticNet) ---
+glm = GLMModel(n_stocks=10)
+glm.train(X_train, y_train, X_val, y_val)
+glm.print_hyperparameters()
+val_metrics = glm.evaluate(X_val, y_val)
+glm.print_summary("GLM Validation", val_metrics)
+test_metrics = glm.evaluate(X_test, y_test)
+glm.print_summary("GLM Test", test_metrics)
+glm.print_feature_importance()
+glm.plot_diagnostics(X_test, y_test)
+'''
+
 
 # --- non-linear models ---
 

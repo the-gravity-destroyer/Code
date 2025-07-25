@@ -2,29 +2,25 @@
 
 import numpy as np
 from sklearn.decomposition import PCA
-from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 from models.linear_models.base_regressor import BaseRegressor
 
 class PCRModel(BaseRegressor):
     def __init__(self, n_stocks=None, k_values=None):
         super().__init__(n_stocks=n_stocks)
-        self.k_values = k_values if k_values is not None else []
+        self.k_values = k_values if k_values is not None else None
         self.best_k = None
 
     def train(self, X_train, y_train, X_val=None, y_val=None):
-        """Suche beste Anzahl Komponenten k anhand Validation-MSE."""
         if X_val is None or y_val is None:
             raise ValueError("X_val und y_val für Hyperparameter-Suche erforderlich.")
         n_features = X_train.shape[1]
-        if not self.k_values:
-            self.k_values = list(range(1, n_features+1))
+        k_list = self.k_values or list(range(1, n_features + 1))
         best_mse = np.inf
-        for k in self.k_values:
+        for k in k_list:
             pipe = Pipeline([
                 ('scaler', StandardScaler()),
                 ('pca',    PCA(n_components=k)),
@@ -39,6 +35,15 @@ class PCRModel(BaseRegressor):
                 self.best_k = k
         self.is_fitted = True
         return self
+
+    def build_pipeline(self):
+        if not self.is_fitted:
+            raise RuntimeError("Call train() first to determine best_k.")
+        return Pipeline([
+            ('scaler', StandardScaler()),
+            ('pca',    PCA(n_components=self.best_k)),
+            ('ols',    LinearRegression())
+        ])
 
     def print_best_k(self):
         print(f"PCR – beste Komponentenanzahl k = {self.best_k}")
@@ -58,3 +63,4 @@ class PCRModel(BaseRegressor):
         for rank, idx in enumerate(idx_sorted[:top_n], 1):
             print(f"  {rank:>2}. Feature {idx:>2} → Importance = {feat_imp[idx]:.4f}")
         print()
+

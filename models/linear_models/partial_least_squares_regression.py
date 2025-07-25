@@ -6,105 +6,61 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
+from sklearn.cross_decomposition import PLSRegression
+from models.linear_models.base_regressor import BaseRegressor
 
-def train_pls_model(
-    X_train, y_train,
-    X_val,   y_val,
-    X_test,  y_test,
-    n_stocks=10,
-    plot=False
-):
-    """
-    Trainiert ein Partial Least Squares (PLS)-Modell:
-     - Wählt Anzahl Komponenten k anhand des Validation-MSE
-     - Liefert Zeitreihen-R², Zero-Return-R², Cross-Sectional-R², MSE auf Val & Test
-     - Berechnet Feature-Importance via absolute PLS-Koeffizienten
-    """
-    # Anzahl Features
-    n_features = X_train.shape[1]
+class PLSModel(BaseRegressor):
+    """Partial Least Squares Regression mit Komponentenwahl."""
+    def __init__(self, n_stocks=None, n_components=None):
+        super().__init__(n_stocks=n_stocks)
+        self.n_components = n_components
+        self.best_k = None
 
-    # Suche k = 1…n_features
-    best_mse = np.inf
-    best_k = None
-    best_pipe = None
-
-    for k in range(1, n_features + 1):
-        pipe = Pipeline([
+    def build_pipeline(self):
+        # Fallback-Pipeline, wird nach train() mit bestem k ersetzt
+        k = self.n_components or 1
+        return Pipeline([
             ('scaler', StandardScaler()),
             ('pls',    PLSRegression(n_components=k))
         ])
-        pipe.fit(X_train, y_train)
-        y_val_pred = pipe.predict(X_val)
-        mse_val = mean_squared_error(y_val, y_val_pred)
-        if mse_val < best_mse:
-            best_mse = mse_val
-            best_k = k
-            best_pipe = pipe
 
-    print(f"PLS – beste Komponentenanzahl k = {best_k} (Validation MSE = {best_mse:.4f})\n")
+    def train(self, X_train, y_train, X_val=None, y_val=None):
+        if X_val is None or y_val is None:
+            raise ValueError("X_val und y_val für Hyperparameter-Suche erforderlich.")
+        n_features = X_train.shape[1]
+        # Komponenten-Bereich: wenn n_components vorgegeben, nur diesen verwenden
+        ks = [self.n_components] if self.n_components else list(range(1, n_features + 1))
+        best_mse = np.inf
+        for k in ks:
+            pipe = Pipeline([
+                ('scaler', StandardScaler()),
+                ('pls',    PLSRegression(n_components=k))
+            ])
+            pipe.fit(X_train, y_train)
+            y_pred = pipe.predict(X_val)
+            mse_val = mean_squared_error(y_val, y_pred)
+            if mse_val < best_mse:
+                best_mse = mse_val
+                self.pipeline = pipe
+                self.best_k = k
+        self.is_fitted = True
+        return self
 
-    # Validation-Metriken
-    y_val_pred = best_pipe.predict(X_val)
-    r2_val     = r2_score(y_val, y_val_pred)
-    r2_zero_val= 1 - np.sum((y_val - y_val_pred)**2) / np.sum(y_val**2)
-    mse_val    = mean_squared_error(y_val, y_val_pred)
-    print(f"PLS - Validation R²:            {r2_val:.4f}")
-    print(f"PLS - Validation Zero-Return R²: {r2_zero_val:.4f}")
-    print(f"PLS - Validation MSE:           {mse_val:.4f}\n")
+    def print_best_k(self):
+        print(f"PLS – beste Komponentenanzahl k = {self.best_k}")
 
-    # Test-Metriken
-    y_test_pred = best_pipe.predict(X_test)
-    mse_test    = mean_squared_error(y_test, y_test_pred)
-    r2_test     = r2_score(y_test, y_test_pred)
-    r2_zero_test= 1 - np.sum((y_test - y_test_pred)**2) / np.sum(y_test**2)
+    def get_feature_importance(self):
+        if not self.is_fitted:
+            raise RuntimeError("Call train() first.")
+        coefs = self.pipeline.named_steps['pls'].coef_.ravel()
+        importance = np.abs(coefs)
+        idx_sorted = np.argsort(-importance)
+        return importance, idx_sorted
 
-    # Cross-Sectional R² im Test-Set
-    n_test = len(y_test)
-    months = np.arange(n_test) // n_stocks
-    n_months_test = months.max() + 1
-    y_bar    = np.array([y_test[months==m].mean()     for m in range(n_months_test)])
-    yhat_bar = np.array([y_test_pred[months==m].mean() for m in range(n_months_test)])
-    counts   = np.array([np.sum(months==m) for m in range(n_months_test)])
-    y_bar_rep    = np.repeat(y_bar,    counts)
-    yhat_bar_rep = np.repeat(yhat_bar, counts)
-    num_cs = np.sum(((y_test - y_bar_rep) - (y_test_pred - yhat_bar_rep))**2)
-    den_cs = np.sum((y_test - y_bar_rep)**2)
-    r2_cs = 1 - num_cs/den_cs
+    def print_feature_importance(self, top_n=10):
+        importance, idx_sorted = self.get_feature_importance()
+        print("PLS Top-Features nach |Koeffizient|:")
+        for rank, idx in enumerate(idx_sorted[:top_n], 1):
+            print(f"  {rank:>2}. Feature {idx:>2} → |coef| = {importance[idx]:.4f}")
+        print()
 
-    print(f"PLS - Test R²:                   {r2_test:.4f}")
-    print(f"PLS - Test Zero-Return R²:       {r2_zero_test:.4f}")
-    print(f"PLS - Test Cross-Sectional R²:   {r2_cs:.4f}")
-    print(f"PLS - Test MSE:                  {mse_test:.4f}\n")
-
-    # Feature Importance: absolute PLS-Koeffizienten
-    # coef_ hat Form (n_features,); bei mehreren Zielen wäre es (n_features, n_targets)
-    coefs = best_pipe.named_steps['pls'].coef_.ravel()
-    importance = np.abs(coefs)
-    idx_sorted = np.argsort(-importance)
-    print("PLS Top-Features nach |Koeffizient|:")
-    for rank, idx in enumerate(idx_sorted[:10], 1):
-        print(f"  {rank:>2}. Feature {idx:>2} → |coef| = {importance[idx]:.4f}")
-    print()
-
-    # Optional: Plots
-    if plot:
-        residuals = y_test - y_test_pred
-        plt.figure()
-        plt.scatter(y_test_pred, residuals, alpha=0.6)
-        plt.axhline(0, linestyle='--', color='gray')
-        plt.xlabel("Predicted Returns")
-        plt.ylabel("Residuals")
-        plt.title(f"PLS (k={best_k}): Residuals vs. Predicted")
-        plt.show()
-
-        plt.figure()
-        plt.scatter(y_test, y_test_pred, alpha=0.6)
-        mn, mx = y_test.min(), y_test.max()
-        plt.plot([mn, mx], [mn, mx], 'r--')
-        plt.xlabel("Actual Returns")
-        plt.ylabel("Predicted Returns")
-        plt.title(f"PLS (k={best_k}): Predicted vs. Actual")
-        plt.show()
-
-    # Rückgabe
-    return best_pipe, best_k, y_test_pred, r2_test, mse_test, r2_zero_test, r2_cs
