@@ -2,13 +2,15 @@
 # Student Exercise Manual
 # Please complete the code
 
-from models.linear_models import ordinary_least_squares_regression as ols
+from models.linear_models import ordinary_least_squares_regression
+from models.linear_models.elastic_net_regression import ElasticNetModel
+from models.linear_models.principal_component_regression import PCRModel
+from data_processing import split_data
 
 
 # -------------------------------
 # Part 1 & 2: Data Generation and Preprocessing
 # -------------------------------
-from data_processing import split_data
 X_train, X_val, X_test, y_train, y_val, y_test = split_data()
 
 # -------------------------------
@@ -16,7 +18,8 @@ X_train, X_val, X_test, y_train, y_val, y_test = split_data()
 # -------------------------------
 
 # --- OLS Model Training and Evaluation ---
-ols_model = ols.OLSModel(n_stocks=10)
+'''
+ols_model = ordinary_least_squares_regression.OLSModel(n_stocks=10)
 ols_model.train(X_train, y_train)
 val_metrics = ols_model.evaluate(X_val, y_val)
 ols_model.print_summary("OLS Validation", val_metrics)
@@ -26,8 +29,27 @@ ols_model.print_feature_importance(top_n=10)
 ols_model.plot_diagnostics(X_test, y_test)
 
 # --- ElasticNet Model Tuning ---
+elastic_net_model = ElasticNetModel(n_stocks=10)
+elastic_net_model.train(X_train, y_train, X_val, y_val)
+elastic_net_model.print_hyperparameters()
+val_metrics = elastic_net_model.evaluate(X_val, y_val)
+elastic_net_model.print_summary("ElasticNet Validation", val_metrics)
+test_metrics = elastic_net_model.evaluate(X_test, y_test)
+elastic_net_model.print_summary("ElasticNet Test", test_metrics)
+elastic_net_model.print_feature_importance(top_n=10)
+elastic_net_model.plot_diagnostics(X_test, y_test)
+'''
 
 # --- Principal Component Regression (PCR) ---
+pcr_model = PCRModel(n_stocks=10)
+pcr_model.train(X_train, y_train, X_val, y_val)
+pcr_model.print_best_k()
+val_metrics = pcr_model.evaluate(X_val, y_val)
+pcr_model.print_summary("PCR Validation", val_metrics)
+test_metrics = pcr_model.evaluate(X_test, y_test)
+pcr_model.print_summary("PCR Test", test_metrics)
+pcr_model.print_feature_importance(top_n=10)
+pcr_model.plot_diagnostics(X_test, y_test)
 
 # --- Partial Least Squares Regression (PLS) ---
 
