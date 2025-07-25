@@ -2,6 +2,12 @@
 # Student Exercise Manual
 # Please complete the code
 
+from models.ordinary_least_squares_regression import train_ols_model
+from models.elastic_net_regression import train_elastic_net_model
+from models.partial_least_squares_regression import train_pls_model
+from models.generalized_linear_model import train_glm_model
+
+
 # -------------------------------
 # Part 1 & 2: Data Generation and Preprocessing
 # -------------------------------
@@ -13,24 +19,20 @@ X_train, X_val, X_test, y_train, y_val, y_test = split_data()
 # -------------------------------
 
 # --- OLS Model Training and Evaluation ---
-from models.ordinary_least_squares_regression import train_ols_model
-ols_model, y_pred_ols, r2_ols, mse_ols = train_ols_model(X_train, y_train, X_val, y_val, X_test, y_test)
+ols_model, y_pred_ols, r2_ols, mse_ols, r2_zero_ols, r2_cs_ols = train_ols_model(X_train, y_train, X_val, y_val, X_test, y_test, n_stocks=10)
 
 # --- ElasticNet Model Tuning ---
-from models.elastic_net_regression import train_elastic_net_model
-elastic_net_model, y_pred_en, r2_en, mse_en = train_elastic_net_model(X_train, y_train, X_test, y_test)
+best_pipe, y_test_pred, r2_test, mse_test, r2_zero_test, r2_cs = train_elastic_net_model(X_train, y_train, X_val, y_val, X_test, y_test, n_stocks = 10)
 
 # --- Principal Component Regression (PCR) ---
 from models.principal_component_regression import train_pcr_model
-pcr = train_pcr_model()
+best_pipe, best_k, y_test_pred, r2_test, mse_test, r2_zero_test, r2_cs = train_pcr_model(X_train, y_train, X_val, y_val, X_test, y_test, n_stocks = 10)
 
 # --- Partial Least Squares Regression (PLS) ---
-from models.partial_least_squares_regression import train_pls_model
-pls_model, y_pred_pls, r2_pls, mse_pls = train_pls_model(X_train, y_train, X_test, y_test)
+best_pipe, best_k, y_test_pred, r2_test, mse_test, r2_zero_test, r2_cs = train_pls_model(X_train, y_train, X_val, y_val, X_test, y_test, n_stocks=10)
 
 # --- Generalized Linear Model (Spline Transformation + ElasticNet) ---
-from models.generalized_linear_model import train_glm_model
-glm_model, y_pred_glm, r2_glm, mse_glm = train_glm_model(X_train, y_train, X_test, y_test)
+best_pipe, y_test_pred, r2_test, mse_test, r2_zero_test, r2_cs = train_glm_model(X_train, y_train, X_val, y_val, X_test, y_test, n_stocks=10)
 
 # --- non-linear models ---
 
