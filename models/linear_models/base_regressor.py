@@ -19,7 +19,7 @@ class BaseRegressor(ABC):
         """Muss eine sklearn-Pipeline oder ähnliches zurückgeben."""
         pass
 
-    def train(self, X_train, y_train):
+    def train(self, X_train, y_train, X_val=None, y_val=None):
         """Trainiert die Pipeline nur mit Trainingsdaten."""
         self.pipeline = self.build_pipeline()
         self.pipeline.fit(X_train, y_train)

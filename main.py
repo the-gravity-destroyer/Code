@@ -2,11 +2,14 @@
 # Student Exercise Manual
 # Please complete the code
 
-from models.linear_models import ordinary_least_squares_regression
+from models.linear_models.ordinary_least_squares_regression import OLSModel
 from models.linear_models.elastic_net_regression import ElasticNetModel
 from models.linear_models.principal_component_regression import PCRModel
 from models.linear_models.partial_least_squares_regression import PLSModel
 from models.linear_models.generalized_linear_model import GLMModel
+from models.non_linear_models.neural_network import NeuralNetworkModel
+#from models.non_linear_models.gradient_boosting import GradientBoostingModel
+#from models.non_linear_models.random_forest import RandomForestModel
 
 from data_processing import split_data
 
@@ -25,7 +28,7 @@ X_train, X_val, X_test, y_train, y_val, y_test = split_data()
 ols_model = OLSModel(n_stocks=10)
 ols_model.train(X_train, y_train)
 val_metrics = ols_model.evaluate(X_val, y_val)
-ols_model.print_summary("OLS Validation", val_metrics)
+ols_model.print_summary("OLS Validation", val_metrics)<
 test_metrics = ols_model.evaluate(X_test, y_test)
 ols_model.print_summary("OLS Test", test_metrics)
 ols_model.print_feature_importance(top_n=10)
@@ -74,12 +77,20 @@ test_metrics = glm.evaluate(X_test, y_test)
 glm.print_summary("GLM Test", test_metrics)
 glm.print_feature_importance()
 glm.plot_diagnostics(X_test, y_test)
-'''
-
 
 # --- non-linear models ---
 
 # --- Neural Network Model ---
+nn_model = NeuralNetworkModel(n_stocks=10)
+nn_model.train(X_train, y_train, X_val, y_val)
+nn_model.print_architecture()
+val_metrics = nn_model.evaluate(X_val, y_val)
+nn_model.print_summary("Neural Network Validation", val_metrics)
+test_metrics = nn_model.evaluate(X_test, y_test)
+nn_model.print_summary("Neural Network Test", test_metrics)
+nn_model.plot_diagnostics(X_test, y_test)
+'''
+
 
 # --- Gradient Boosting Regressor ---
 
