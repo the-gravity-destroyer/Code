@@ -7,7 +7,7 @@ from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
 from sklearn.cross_decomposition import PLSRegression
-from models.linear_models.base_regressor import BaseRegressor
+from models.base_regressor import BaseRegressor
 
 class PLSModel(BaseRegressor):
     """Partial Least Squares Regression mit Komponentenwahl."""

@@ -1,7 +1,7 @@
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.neural_network import MLPRegressor
-from models.linear_models.base_regressor import BaseRegressor
+from models.base_regressor import BaseRegressor
 
 class NeuralNetworkModel(BaseRegressor):
     """Feed-Forward Neural Network (FFN) basierend auf MLPRegressor nach Lecture Slides."""

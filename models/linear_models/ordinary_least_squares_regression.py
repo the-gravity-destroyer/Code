@@ -1,7 +1,7 @@
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
-from models.linear_models.base_regressor import BaseRegressor
+from models.base_regressor import BaseRegressor
 import numpy as np
 
 class OLSModel(BaseRegressor):

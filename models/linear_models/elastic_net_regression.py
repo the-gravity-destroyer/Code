@@ -3,7 +3,7 @@ from sklearn.linear_model import ElasticNet
 from sklearn.metrics import mean_squared_error
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from models.linear_models.base_regressor import BaseRegressor
+from models.base_regressor import BaseRegressor
 import numpy as np
 
 

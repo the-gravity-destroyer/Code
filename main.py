@@ -27,68 +27,28 @@ X_train, X_val, X_test, y_train, y_val, y_test = split_data()
 '''
 ols_model = OLSModel(n_stocks=10)
 ols_model.train(X_train, y_train)
-val_metrics = ols_model.evaluate(X_val, y_val)
-ols_model.print_summary("OLS Validation", val_metrics)<
-test_metrics = ols_model.evaluate(X_test, y_test)
-ols_model.print_summary("OLS Test", test_metrics)
-ols_model.print_feature_importance(top_n=10)
-ols_model.plot_diagnostics(X_test, y_test)
 
 # --- ElasticNet Model Tuning ---
 elastic_net_model = ElasticNetModel(n_stocks=10)
 elastic_net_model.train(X_train, y_train, X_val, y_val)
-elastic_net_model.print_hyperparameters()
-val_metrics = elastic_net_model.evaluate(X_val, y_val)
-elastic_net_model.print_summary("ElasticNet Validation", val_metrics)
-test_metrics = elastic_net_model.evaluate(X_test, y_test)
-elastic_net_model.print_summary("ElasticNet Test", test_metrics)
-elastic_net_model.print_feature_importance(top_n=10)
-elastic_net_model.plot_diagnostics(X_test, y_test)
 
 # --- Principal Component Regression (PCR) ---
 pcr_model = PCRModel(n_stocks=10)
 pcr_model.train(X_train, y_train, X_val, y_val)
-pcr_model.print_best_k()
-val_metrics = pcr_model.evaluate(X_val, y_val)
-pcr_model.print_summary("PCR Validation", val_metrics)
-test_metrics = pcr_model.evaluate(X_test, y_test)
-pcr_model.print_summary("PCR Test", test_metrics)
-pcr_model.print_feature_importance(top_n=10)
-pcr_model.plot_diagnostics(X_test, y_test)
 
 # --- Partial Least Squares Regression (PLS) ---
 pls_model = PLSModel(n_stocks=10)
 pls_model.train(X_train, y_train, X_val, y_val)
-pls_model.print_best_k()
-val_metrics = pls_model.evaluate(X_val, y_val)
-pls_model.print_summary("PCR Validation", val_metrics)
-test_metrics = pls_model.evaluate(X_test, y_test)
-pls_model.print_summary("PCR Test", test_metrics)
-pls_model.print_feature_importance(top_n=10)
-pls_model.plot_diagnostics(X_test, y_test)
 
 # --- Generalized Linear Model (Spline Transformation + ElasticNet) ---
 glm = GLMModel(n_stocks=10)
 glm.train(X_train, y_train, X_val, y_val)
-glm.print_hyperparameters()
-val_metrics = glm.evaluate(X_val, y_val)
-glm.print_summary("GLM Validation", val_metrics)
-test_metrics = glm.evaluate(X_test, y_test)
-glm.print_summary("GLM Test", test_metrics)
-glm.print_feature_importance()
-glm.plot_diagnostics(X_test, y_test)
 
 # --- non-linear models ---
 
 # --- Neural Network Model ---
 nn_model = NeuralNetworkModel(n_stocks=10)
 nn_model.train(X_train, y_train, X_val, y_val)
-nn_model.print_architecture()
-val_metrics = nn_model.evaluate(X_val, y_val)
-nn_model.print_summary("Neural Network Validation", val_metrics)
-test_metrics = nn_model.evaluate(X_test, y_test)
-nn_model.print_summary("Neural Network Test", test_metrics)
-nn_model.plot_diagnostics(X_test, y_test)
 '''
 
 
@@ -104,11 +64,62 @@ nn_model.plot_diagnostics(X_test, y_test)
 # -------------------------------
 # Part 5: Full-Sample Time Series Plots - to see the predictions vs. actuals
 # -------------------------------
+'''
+ols_model.plot_diagnostics(X_test, y_test)
+elastic_net_model.plot_diagnostics(X_test, y_test)
+pcr_model.plot_diagnostics(X_test, y_test)
+pls_model.plot_diagnostics(X_test, y_test)
+glm.plot_diagnostics(X_test, y_test)
+nn_model.plot_diagnostics(X_test, y_test)
+'''
+
 
 # -------------------------------
 # Part 6: Out-of-Sample R² Results Table - to evaluate model performance
 # -------------------------------
 # TODO: Calculate R² according to the formula: 1 - (sum of squared errors / total sum of squares)
+'''
+val_metrics = ols_model.evaluate(X_val, y_val)
+ols_model.print_summary("OLS Validation", val_metrics)<
+test_metrics = ols_model.evaluate(X_test, y_test)
+ols_model.print_summary("OLS Test", test_metrics)
+ols_model.print_feature_importance(top_n=10)
+
+elastic_net_model.print_hyperparameters()
+val_metrics = elastic_net_model.evaluate(X_val, y_val)
+elastic_net_model.print_summary("ElasticNet Validation", val_metrics)
+test_metrics = elastic_net_model.evaluate(X_test, y_test)
+elastic_net_model.print_summary("ElasticNet Test", test_metrics)
+elastic_net_model.print_feature_importance(top_n=10)
+
+pcr_model.print_best_k()
+val_metrics = pcr_model.evaluate(X_val, y_val)
+pcr_model.print_summary("PCR Validation", val_metrics)
+test_metrics = pcr_model.evaluate(X_test, y_test)
+pcr_model.print_summary("PCR Test", test_metrics)
+pcr_model.print_feature_importance(top_n=10)
+
+pls_model.print_best_k()
+val_metrics = pls_model.evaluate(X_val, y_val)
+pls_model.print_summary("PLS Validation", val_metrics)
+test_metrics = pls_model.evaluate(X_test, y_test)
+pls_model.print_summary("PLS Test", test_metrics)
+pls_model.print_feature_importance(top_n=10)
+
+glm.print_hyperparameters()
+val_metrics = glm.evaluate(X_val, y_val)
+glm.print_summary("GLM Validation", val_metrics)
+test_metrics = glm.evaluate(X_test, y_test)
+glm.print_summary("GLM Test", test_metrics)
+glm.print_feature_importance()
+
+
+nn_model.print_architecture()
+val_metrics = nn_model.evaluate(X_val, y_val)
+nn_model.print_summary("Neural Network Validation", val_metrics)
+test_metrics = nn_model.evaluate(X_test, y_test)
+nn_model.print_summary("Neural Network Test", test_metrics)
+'''
 
 # -------------------------------
 # Part 7: Diebold-Mariano Test Statistics - to compare model predictions

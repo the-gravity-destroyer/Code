@@ -8,7 +8,7 @@ from sklearn.preprocessing import SplineTransformer
 from sklearn.linear_model import ElasticNet
 from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
-from models.linear_models.base_regressor import BaseRegressor
+from models.base_regressor import BaseRegressor
 
 class GLMModel(BaseRegressor):
     """Generalized Linear Model: Splines + ElasticNet-Regularisierung."""
