@@ -26,13 +26,13 @@ def split_data():
     features = []
     returns = []
 
-    # Lagged features: für Retoure in Periode t nur Daten bis t-1 verwenden
+    # Lagged features: for returns in period t, only use data up to t-1
     for t in range(1, n_months):
         for i in range(n_stocks):
             stock_prev = stock_characteristics[i, t-1, :]
             macro_prev = macro_factors[t-1, :]
             x_t = np.concatenate([stock_prev, macro_prev])
-            # Synthetic Return ebenfalls basierend auf den gelaggten Merkmalen
+            # Synthetic Return: returns in period t
             ret_t = (stock_prev.dot(np.array([0.2, -0.1, 0.3, 0.1, 0.05])) +
                      macro_prev.dot(np.array([0.3, -0.2, 0.1])))
 

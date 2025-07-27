@@ -4,21 +4,21 @@ import matplotlib.pyplot as plt
 
 class DecilePortfolioAnalysis:
     """
-    Durchführung und Visualisierung einer Decile-Portfolio-Analyse für Modellvorhersagen.
+    Conducts and visualizes a decile portfolio analysis for model predictions.
     """
     def __init__(self, n_stocks: int):
         self.n_stocks = n_stocks
 
     def compute_decile_returns(self, y_pred: np.ndarray, y_true: np.ndarray) -> pd.DataFrame:
         """
-        Ordnet Vorhersagen in monatliche Deciles und berechnet die realisierten Returns je Decile.
-        Gibt einen DataFrame mit mittlerem Return und Sharpe Ratio pro Decile zurück.
+        Assigns predictions to monthly deciles and calculates the realized returns for each decile.
+        Returns a DataFrame with mean return and Sharpe ratio per decile.
         """
-        # Zeitliche Zuordnung (Monat à n_stocks Beobachtungen)
+        # Temporal assignment (each month has n_stocks observations)
         months = np.arange(len(y_true)) // self.n_stocks
         unique_months = np.unique(months)
 
-        # Sammelstruktur für Decile-Returns
+        # Data structure for collecting decile returns
         decile_returns = {dec: [] for dec in range(1, 11)}
 
         # Loop through months
@@ -47,7 +47,7 @@ class DecilePortfolioAnalysis:
 
     def plot_sharpe(self, df_deciles: pd.DataFrame, title: str = "Decile Sharpe Ratios") -> None:
         """
-        Bar-Chart der Sharpe Ratios je Decile.
+        Bar chart of Sharpe ratios per decile.
         """
         plt.figure(figsize=(8, 5))
         plt.bar(df_deciles.index, df_deciles['sharpe_ratio'])
@@ -60,7 +60,7 @@ class DecilePortfolioAnalysis:
 
     def plot_cumulative_returns(self, df_deciles: pd.DataFrame, title: str = "Decile Cumulative Returns") -> None:
         """
-        Liniendiagramm der kumulativen Returns je Decile.
+        Line plot of cumulative returns per decile.
         """
         cumulative = (1 + df_deciles['mean_return']).cumprod() - 1
         plt.figure(figsize=(8, 5))

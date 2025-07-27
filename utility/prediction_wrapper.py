@@ -4,22 +4,22 @@ import pandas as pd
 
 class PredictionWrapper:
     """
-    Wrappt beliebige BaseRegressor-Instanzen und liefert
-    auf predict() einen DataFrame mit einer Spalte pro Modell.
+    Wraps any BaseRegressor instance
+    and returns a DataFrame with one column per model on predict().
     """
 
     def __init__(self, models: dict):
         """
         models: Dict[str, BaseRegressor]
-            Schlüssel = Modellname, Wert = schon gefittete Modell-Instanz
+        Key = model name, value = already fitted model instance
         """
         self.models = models
 
     def predict(self, X):
         """
-        Ruft .predict(X) für jedes Modell auf und gibt
-        einen pandas.DataFrame zurück, in dem jede Spalte
-        die Vorhersagen eines Modells enthält.
+        Calls .predict(X) for each model and returns
+        a pandas.DataFrame where each column
+        contains the predictions of a model.
         """
         results = {}
         for name, model in self.models.items():

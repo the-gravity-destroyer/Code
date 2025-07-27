@@ -4,7 +4,10 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from decile_portfolio import DecilePortfolioAnalysis
 from utility.variable_importance import drop_feature_importance
+from utility.prediction_wrapper import PredictionWrapper
+
 
 from models.linear_models.ordinary_least_squares_regression import OLSModel
 from models.linear_models.elastic_net_regression import ElasticNetModel
@@ -78,9 +81,8 @@ def main():
     # -------------------------------
     # Part 4: Prediction Wrappers
     # -------------------------------
-    from utility.prediction_wrapper import PredictionWrapper
 
-    # alle Modelle im Dictionary sammeln
+    # collect all models in dictionary
     models = {
         'OLS':                ols_model,
         'ElasticNet':         elastic_net_model,
@@ -92,15 +94,14 @@ def main():
         'RandomForest':       random_forest_model
     }
 
-    # Wrapper instanziieren (alle Modelle müssen bereits trainiert sein)
+    # instantiate the wrapper with the trained models
     wrapper = PredictionWrapper(models)
 
-    # Auf dem Test-Set alle Vorhersagen sammeln
+    # Collect predictions for all models on the test set
     df_preds = wrapper.predict(X_test)
     print(df_preds.head())   # zeigt die ersten Zeilen mit 8 Spalten
 
-    # Bei Bedarf direkt z.B. in Part 6:
-    # Out-of-Sample R² für alle Modelle in einer Schleife
+    # Out-of-Sample R² for all models in a loop
     for name in df_preds.columns:
         y_pred = df_preds[name].values
         metrics = models[name].evaluate(X_test, y_test)
@@ -122,7 +123,7 @@ def main():
 
 
     # -------------------------------
-    # Part 6: Out-of-Sample R² Results Table - to evaluate model performance TODO: Calculate R² according to the formula: 1 - (sum of squared errors / total sum of squares)
+    # Part 6: Out-of-Sample R² Results Table - to evaluate model performance
     # -------------------------------
     val_metrics = ols_model.evaluate(X_val, y_val)
     ols_model.print_summary("OLS Validation", val_metrics)
@@ -230,42 +231,43 @@ def main():
     # -------------------------------
     # Part 8: Variable Importance Calculations & Heatmaps - to understand feature importance ( to see which features are more important) TODO: Define a function to compute variable importance based on the drop in R² when a feature is removed
     # -------------------------------
-    # Angenommen, feature_names ist z.B.:
+
+    # 1) Define the feature names based on the training data
     feature_names = [f"feat_{i}" for i in range(X_train.shape[1])]
 
-    # Berechne Importances für alle Modelle
-    from utility.variable_importance import drop_feature_importance
+    # 2) Dictionary for all models and their __init__ arguments
+    models_info = {
+        "OLS":               (ols_model,              {"n_stocks":10}),
+        "ElasticNet":        (elastic_net_model,      {"n_stocks":10}),
+        "PCR":               (pcr_model,              {"n_stocks":10}),
+        "PLS":               (pls_model,              {"n_stocks":10}),
+        "GLM":               (glm,                    {"n_stocks":10}),
+        "NeuralNetwork":     (nn_model,               {"n_stocks":10}),
+        "GradientBoosting":  (gradient_boosting_model,{"n_stocks":10}),
+        "RandomForest":      (random_forest_model,    {"n_stocks":10})
+    }
 
-    feature_names = [f"feat_{i}" for i in range(X_train.shape[1])]
+    # 3) Drop-in-R² for every model
+    vi_dict = {}
+    for name, (model_inst, init_args) in models_info.items():
+        vi = drop_feature_importance(
+            model_inst,
+            init_args,
+            X_train, y_train,
+            X_val,   y_val,
+            X_test,  y_test,
+            feature_names
+        )
+        vi_dict[name] = vi
 
-    # Beispiel für ElasticNet:
-    vi_en = drop_feature_importance(
-        elastic_net_model,                      # schon gefittetes Modell
-        {'n_stocks':10},                        # + ggf. alle __init__-Args (ElasticNetModel zieht seine propre alphas/l1_ratios intern)
-        X_train, y_train,
-        X_val,   y_val,
-        X_test,  y_test,
-        feature_names
-    )
+    # 4) Concatenate in DataFrame
+    df_vi = pd.concat(vi_dict, axis=1)
 
-    # Für andere Modelle analog:
-    vi_rf = drop_feature_importance(random_forest_model, {'n_stocks':10}, 
-                                    X_train, y_train, X_val, y_val, X_test, y_test, feature_names)
-
-    # Dann Heatmap:
-    import seaborn as sns
-    import matplotlib.pyplot as plt
-
-    df_vi = pd.concat({
-        'ElasticNet': vi_en,
-        'RandomForest': vi_rf,
-        # ... weitere Modelle
-    }, axis=1)
-
-    plt.figure(figsize=(12,8))
+    # 5) Plotting Heatmap
+    plt.figure(figsize=(12, 8))
     sns.heatmap(df_vi, annot=True, fmt=".3f", cmap="viridis")
-    plt.title("Variable Importance (Drop in R²)")
-    plt.xlabel("Modell")
+    plt.title("Variable Importance (Drop in R²) Across Models")
+    plt.xlabel("Model")
     plt.ylabel("Feature")
     plt.tight_layout()
     plt.show()
@@ -274,19 +276,28 @@ def main():
     # -------------------------------
     # Part 9: Auxiliary Functions and Decile Portfolio Analysis - to analyze model performance across deciles - to compare predicted vs actual  sharpe ratios
     # -------------------------------
-    from utility.decile_portfolio import DecilePortfolioAnalysis
-
-    # Instanziieren mit der Anzahl Stocks pro Periode
+    # 1) Instantiate with the number of stocks per period
     decile_analyzer = DecilePortfolioAnalysis(n_stocks=10)
 
-    # Für jedes Modell
-    df_ols = decile_analyzer.compute_decile_returns(y_pred_ols, y_test)
-    decile_analyzer.plot_sharpe(df_ols, title="OLS Decile Sharpe Ratios")
+    # 2) Dictionary with all predictions
+    predictions = {
+        "OLS":               y_pred_ols,
+        "ElasticNet":        y_pred_en,
+        "PCR":               y_pred_pcr,
+        "PLS":               y_pred_pls,
+        "GLM":               y_pred_glm,
+        "NeuralNetwork":     y_pred_nn,
+        "GradientBoosting":  y_pred_gb,
+        "RandomForest":      y_pred_rf
+    }
 
-    df_rf = decile_analyzer.compute_decile_returns(y_pred_rf, y_test)
-    decile_analyzer.plot_sharpe(df_rf, title="RandomForest Decile Sharpe Ratios")
-
-    # Und so weiter für alle Modelle…
+    # 3) Compute decile returns and plot Sharpe ratios for each model
+    for model_name, y_pred in predictions.items():
+        df_deciles = decile_analyzer.compute_decile_returns(y_pred, y_test)
+        decile_analyzer.plot_sharpe(
+            df_deciles,
+            title=f"{model_name} Decile Sharpe Ratios"
+        )
 
 
 if __name__ == "__main__":

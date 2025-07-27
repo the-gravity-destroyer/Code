@@ -11,14 +11,14 @@ import matplotlib.pyplot as plt
 from models.base_regressor import BaseRegressor
 
 class GLMModel(BaseRegressor):
-    """Generalized Linear Model: Splines + ElasticNet-Regularisierung."""
+    """Generalized Linear Model: Splines + ElasticNet-Regularization."""
     def __init__(self, n_stocks=None, knot_options=None, alphas=None, l1_ratios=None):
         super().__init__(n_stocks=n_stocks)
         self.knot_options = knot_options if knot_options is not None else [3,5,7]
         self.alphas       = alphas         if alphas       is not None else [0.01, 0.1, 1.0]
         self.l1_ratios    = l1_ratios      if l1_ratios    is not None else [0.2, 0.5, 0.8]
         self.best_params  = {}
-        self.p_orig       = None  # Anzahl Original-Features
+        self.p_orig       = None  # Original Feature Count
 
     def build_pipeline(self, n_knots):
         return Pipeline([
@@ -31,12 +31,12 @@ class GLMModel(BaseRegressor):
 
     def train(self, X_train, y_train, X_val=None, y_val=None):
         if X_val is None or y_val is None:
-            raise ValueError("X_val und y_val für Hyperparameter-Suche erforderlich.")
-        # Original Feature Count speichern
+            raise ValueError("X_val and y_val are required for hyperparameter search.")
+        # Save original Feature Count
         self.p_orig = X_train.shape[1]
         best_mse = np.inf
 
-        # Schleife über Splines, alpha und l1_ratio
+        # Loop over Splines, alpha und l1_ratio
         for k in self.knot_options:
             for alpha in self.alphas:
                 for l1 in self.l1_ratios:
@@ -61,7 +61,7 @@ class GLMModel(BaseRegressor):
         return self
 
     def print_hyperparameters(self):
-        print("GLM Model – beste Hyperparameter:")
+        print("GLM Model – best Hyperparameters:")
         print(f"  n_knots  = {self.best_params['n_knots']}")
         print(f"  alpha    = {self.best_params['alpha']}")
         print(f"  l1_ratio = {self.best_params['l1_ratio']}")
@@ -69,11 +69,11 @@ class GLMModel(BaseRegressor):
     def get_feature_importance(self):
         if not self.is_fitted:
             raise RuntimeError("Call train() first.")
-        # absolute Koeffizienten je Spline-Basis
+        # absolute coefficients per spline basis
         coefs = self.pipeline.named_steps['en'].coef_
-        # Aggregation je Original-Feature
+        # Aggregation per original feature
         p = self.p_orig
-        # Anzahl Splines pro Feature = len(coefs) // p
+        # Number of splines per feature = len(coefs) // p
         n_basis = coefs.shape[0] // p
         importances = [
             np.sum(np.abs(coefs[i*n_basis:(i+1)*n_basis]))
@@ -84,7 +84,7 @@ class GLMModel(BaseRegressor):
 
     def print_feature_importance(self, top_n=10):
         imps, idx_sorted = self.get_feature_importance()
-        print("GLM Top-Features (aggregierte |Spline-Koeffizienten|):")
+        print("GLM Top Features (aggregated |spline coefficients|):")
         for rank, idx in enumerate(idx_sorted[:top_n], 1):
             print(f"  {rank:>2}. Feature {idx:>2} → Importance = {imps[idx]:.4f}")
         print()

@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 class BaseRegressor(ABC):
     """
-    Abstrakte Basisklasse für alle Regressoren.
-    Stellt Standard-Interface für Training, Vorhersage, Evaluation und Plotting bereit.
+    Abstract base class for all regressors.
+    Provides a standard interface for training, prediction, evaluation, and plotting.
     """
 
     def __init__(self, n_stocks=None):
@@ -16,25 +16,25 @@ class BaseRegressor(ABC):
 
     @abstractmethod
     def build_pipeline(self):
-        """Muss eine sklearn-Pipeline oder ähnliches zurückgeben."""
+        """Must return a sklearn pipeline or similar object."""
         pass
 
     def train(self, X_train, y_train, X_val=None, y_val=None):
-        """Trainiert die Pipeline nur mit Trainingsdaten."""
+        """Trains the pipeline using only the training data."""
         self.pipeline = self.build_pipeline()
         self.pipeline.fit(X_train, y_train)
         self.is_fitted = True
         return self
 
     def predict(self, X):
-        """Gibt Vorhersagen zurück. Muss nach train() aufgerufen werden."""
+        """Returns predictions. Must be called after train()."""
         if not self.is_fitted:
             raise RuntimeError("Model is not fitted yet. Call train() first.")
         return self.pipeline.predict(X)
 
     def evaluate(self, X, y):
         """
-        Berechnet MSE, R2, Zero-Return R2 und optional Cross-Sectional R2, falls n_stocks vorliegt.
+        Calculates MSE, R2, zero-return R2, and optionally cross-sectional R2 if n_stocks is provided.
         """
         y_pred = self.predict(X)
         mse    = mean_squared_error(y, y_pred)
@@ -56,14 +56,14 @@ class BaseRegressor(ABC):
         return results
 
     def print_summary(self, title, metrics):
-        """Schöner Konsolen-Output der Kennzahlen."""
+        """Nicely formatted console output of the metrics."""
         print(f"=== {title} ===")
         for k, v in metrics.items():
             print(f"{k:10s}: {v:.4f}")
         print()
 
     def plot_diagnostics(self, X_test, y_test):
-        """Residual- und Scatterplots für Test-Daten."""
+        """Residual and scatter plots for test data."""
         y_pred = self.predict(X_test)
         residuals = y_test - y_pred
         # Residuals vs Predicted

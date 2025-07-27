@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestRegressor
 from models.base_regressor import BaseRegressor
 
 class RandomForestModel(BaseRegressor):
-    """Random Forest Regressor mit optionaler Hyperparameter-Suche."""
+    """Random Forest regressor with optional hyperparameter search."""
     def __init__(
         self,
         n_stocks=None,
@@ -24,7 +24,7 @@ class RandomForestModel(BaseRegressor):
         self.best_params      = {}
 
     def build_pipeline(self):
-        # Fallback-Pipeline mit den besten Parametern (nach train())
+        # Fallback pipeline with the best parameters (after train())
         return Pipeline([
             ('scaler', StandardScaler()),
             ('rf',     RandomForestRegressor(
@@ -38,7 +38,7 @@ class RandomForestModel(BaseRegressor):
 
     def train(self, X_train, y_train, X_val=None, y_val=None):
         if X_val is None or y_val is None:
-            raise ValueError("X_val und y_val für Hyperparameter-Suche erforderlich.")
+            raise ValueError("X_val and y_val are required for hyperparameter search.")
         best_mse = np.inf
 
         # Grid-Search über Parameter
@@ -70,7 +70,7 @@ class RandomForestModel(BaseRegressor):
         return self
 
     def print_hyperparameters(self):
-        print("RandomForest – beste Hyperparameter:")
+        print("RandomForest – best hyperparameters:")
         for k, v in self.best_params.items():
             print(f"  {k:20s}: {v}")
         print()
@@ -84,7 +84,7 @@ class RandomForestModel(BaseRegressor):
 
     def print_feature_importance(self, top_n=10):
         imp, idx_sorted = self.get_feature_importance()
-        print("RF Top-Features nach feature_importances_:")
+        print("RF top features according to feature_importances_:")
         for rank, idx in enumerate(idx_sorted[:top_n], 1):
             print(f"  {rank:>2}. Feature {idx:>2} → importance = {imp[idx]:.4f}")
         print()

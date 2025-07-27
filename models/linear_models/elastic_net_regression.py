@@ -8,10 +8,10 @@ import numpy as np
 
 
 class ElasticNetModel(BaseRegressor):
-    """Elastic Net Regression mit manueller Hyperparameter-Suche."""
+    """Elastic Net Regression with manual hyperparameter search."""
     def __init__(self, n_stocks=None, alphas=None, l1_ratios=None):
         super().__init__(n_stocks=n_stocks)
-        # Default-Gitter
+        # Default-Grid
         self.alphas = alphas if alphas is not None else [0.01, 0.1, 1.0]
         self.l1_ratios = l1_ratios if l1_ratios is not None else [0.2, 0.5, 0.8]
         self.base_pipe = Pipeline([
@@ -21,15 +21,15 @@ class ElasticNetModel(BaseRegressor):
         self.best_params = {}
 
     def build_pipeline(self):
-        # Wird nicht direkt verwendet, da train() die beste Pipeline setzt
+        # Not used directly, since train() sets the best pipeline
         return self.base_pipe
 
     def train(self, X_train, y_train, X_val=None, y_val=None):
         """
-        Führt Grid-Search auf Validation-Set durch und speichert bestes Modell.
+        Performs grid search on the validation set and stores the best model.
         """
         if X_val is None or y_val is None:
-            raise ValueError("X_val und y_val für Hyperparameter-Suche erforderlich.")
+            raise ValueError("X_val und y_val für Hyperparameter-Search required.")
         best_mse = np.inf
         for alpha in self.alphas:
             for l1 in self.l1_ratios:
@@ -46,8 +46,8 @@ class ElasticNetModel(BaseRegressor):
         return self
 
     def print_hyperparameters(self):
-        """Gibt die gewählten Hyperparameter und Val-MSE aus."""
-        print("ElasticNet – beste Hyperparameter:")
+        """Prints the chosen hyperparameters and validation MSE."""
+        print("ElasticNet – best Hyperparameters:")
         print(f"  alpha = {self.best_params['alpha']}, l1_ratio = {self.best_params['l1_ratio']}")
 
     def get_standardized_coefficients(self):
@@ -60,7 +60,7 @@ class ElasticNetModel(BaseRegressor):
 
     def print_feature_importance(self, top_n=10):
         importance, idx_sorted = self.get_standardized_coefficients()
-        print("ElasticNet Top-Features nach |standardisiertem Koeffizienten|:")
+        print("ElasticNet top features by |standardized coefficient|:")
         for rank, idx in enumerate(idx_sorted[:top_n], 1):
             print(f"  {rank:>2}. Feature {idx:>2} → |coef| = {importance[idx]:.4f}")
         print()

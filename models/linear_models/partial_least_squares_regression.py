@@ -10,14 +10,14 @@ from sklearn.cross_decomposition import PLSRegression
 from models.base_regressor import BaseRegressor
 
 class PLSModel(BaseRegressor):
-    """Partial Least Squares Regression mit Komponentenwahl."""
+    """Partial Least Squares Regression with component selection."""
     def __init__(self, n_stocks=None, n_components=None):
         super().__init__(n_stocks=n_stocks)
         self.n_components = n_components
         self.best_k = None
 
     def build_pipeline(self):
-        # Fallback-Pipeline, wird nach train() mit bestem k ersetzt
+        # Fallback pipeline, will be replaced after train() with the best k
         k = self.n_components or 1
         return Pipeline([
             ('scaler', StandardScaler()),
@@ -26,9 +26,9 @@ class PLSModel(BaseRegressor):
 
     def train(self, X_train, y_train, X_val=None, y_val=None):
         if X_val is None or y_val is None:
-            raise ValueError("X_val und y_val für Hyperparameter-Suche erforderlich.")
+            raise ValueError("X_val and y_val are required for hyperparameter search.")
         n_features = X_train.shape[1]
-        # Komponenten-Bereich: wenn n_components vorgegeben, nur diesen verwenden
+        # Component range: if n_components is specified, use only this value
         ks = [self.n_components] if self.n_components else list(range(1, n_features + 1))
         best_mse = np.inf
         for k in ks:
@@ -47,7 +47,7 @@ class PLSModel(BaseRegressor):
         return self
 
     def print_best_k(self):
-        print(f"PLS – beste Komponentenanzahl k = {self.best_k}")
+        print(f"PLS – best number of components k = {self.best_k}")
 
     def get_feature_importance(self):
         if not self.is_fitted:
@@ -59,7 +59,7 @@ class PLSModel(BaseRegressor):
 
     def print_feature_importance(self, top_n=10):
         importance, idx_sorted = self.get_feature_importance()
-        print("PLS Top-Features nach |Koeffizient|:")
+        print("PLS top features by |coefficient|:")
         for rank, idx in enumerate(idx_sorted[:top_n], 1):
             print(f"  {rank:>2}. Feature {idx:>2} → |coef| = {importance[idx]:.4f}")
         print()

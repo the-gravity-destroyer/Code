@@ -4,7 +4,7 @@ from sklearn.neural_network import MLPRegressor
 from models.base_regressor import BaseRegressor
 
 class NeuralNetworkModel(BaseRegressor):
-    """Feed-Forward Neural Network (FFN) basierend auf MLPRegressor nach Lecture Slides."""
+    """Feed-forward neural network (FFN) based on MLPRegressor."""
     def __init__(self, n_stocks=None,
                  hidden_layer_sizes=(20,20,20),
                  activation='logistic',
@@ -25,7 +25,7 @@ class NeuralNetworkModel(BaseRegressor):
         self.batch_size          = batch_size
 
     def build_pipeline(self):
-        # Pipeline: Skalierung + MLPRegressor
+        # Pipeline: Skaling + MLPRegressor
         return Pipeline([
             ('scaler', StandardScaler()),
             ('nn',     MLPRegressor(
@@ -42,8 +42,6 @@ class NeuralNetworkModel(BaseRegressor):
             )
         ])
 
-    # Für Neuronale Netze genügt BaseRegressor.train(), evaluate(), plot_diagnostics()
-    # Optional: Methode zur Ausgabe der Architektur
     def print_architecture(self):
         print(f"NN Architecture: layers={self.hidden_layer_sizes}, activation={self.activation}")
         print(f"Alpha={self.alpha}, lr_init={self.learning_rate_init}")

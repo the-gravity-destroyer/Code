@@ -7,7 +7,7 @@ from models.base_regressor import BaseRegressor
 
 
 class GradientBoostingModel(BaseRegressor):
-    """Gradient Boosting Regressor mit optionaler Hyperparameter-Suche."""
+    """Gradient Boosting Regressor with optional hyperparameter search."""
     def __init__(
         self,
         n_stocks=None,
@@ -24,7 +24,7 @@ class GradientBoostingModel(BaseRegressor):
         self.best_params   = {}
 
     def build_pipeline(self):
-        # Fallback: verwendet best_params, falls train() bereits lief
+        # Fallback: uses best_params if train() has already been called
         return Pipeline([
             ('scaler', StandardScaler()),
             ('gbr',    GradientBoostingRegressor(
@@ -37,7 +37,7 @@ class GradientBoostingModel(BaseRegressor):
 
     def train(self, X_train, y_train, X_val=None, y_val=None):
         if X_val is None or y_val is None:
-            raise ValueError("X_val und y_val für Hyperparameter-Suche erforderlich.")
+            raise ValueError("X_val and y_val are required for hyperparameter search.")
         best_mse = np.inf
         for n in self.estimators:
             for lr in self.learning_rates:
@@ -66,7 +66,7 @@ class GradientBoostingModel(BaseRegressor):
         return self
 
     def print_hyperparameters(self):
-        print("GradientBoosting – beste Hyperparameter:")
+        print("GradientBoosting – best hyperparameters:")
         for k, v in self.best_params.items():
             print(f"  {k:15s}: {v}")
         print()
@@ -80,7 +80,7 @@ class GradientBoostingModel(BaseRegressor):
 
     def print_feature_importance(self, top_n=10):
         imp, idx_sorted = self.get_feature_importance()
-        print("GBR Top-Features nach importance_:")
+        print("GBR top features by importance_:")
         for rank, idx in enumerate(idx_sorted[:top_n], 1):
             print(f"  {rank:>2}. Feature {idx:>2} → importance = {imp[idx]:.4f}")
         print()

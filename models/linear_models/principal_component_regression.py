@@ -16,7 +16,7 @@ class PCRModel(BaseRegressor):
 
     def train(self, X_train, y_train, X_val=None, y_val=None):
         if X_val is None or y_val is None:
-            raise ValueError("X_val und y_val für Hyperparameter-Suche erforderlich.")
+            raise ValueError("X_val and y_val are required for hyperparameter search.")
         n_features = X_train.shape[1]
         k_list = self.k_values or list(range(1, n_features + 1))
         best_mse = np.inf
@@ -46,7 +46,7 @@ class PCRModel(BaseRegressor):
         ])
 
     def print_best_k(self):
-        print(f"PCR – beste Komponentenanzahl k = {self.best_k}")
+        print(f"PCR – best number of components k = {self.best_k}")
 
     def get_feature_importance(self):
         if not self.is_fitted:
@@ -59,7 +59,7 @@ class PCRModel(BaseRegressor):
 
     def print_feature_importance(self, top_n=10):
         feat_imp, idx_sorted = self.get_feature_importance()
-        print("PCR Top-Features nach |Loading×Coef|:")
+        print("PCR top features by |Loading×Coef|:")
         for rank, idx in enumerate(idx_sorted[:top_n], 1):
             print(f"  {rank:>2}. Feature {idx:>2} → Importance = {feat_imp[idx]:.4f}")
         print()

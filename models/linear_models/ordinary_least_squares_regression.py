@@ -5,7 +5,7 @@ from models.base_regressor import BaseRegressor
 import numpy as np
 
 class OLSModel(BaseRegressor):
-    """OLS-Regressionsmodell mit Basisklasse-Unterstützung."""
+    """OLS regression model with base class support."""
 
     def __init__(self, n_stocks=None):
         super().__init__(n_stocks=n_stocks)
@@ -26,7 +26,7 @@ class OLSModel(BaseRegressor):
 
     def print_feature_importance(self, top_n=10):
         importance, idx_sorted = self.get_standardized_coefficients()
-        print("Top Features nach |standardisiertem Koeffizienten|:")
+        print("Top features by |standardized coefficient|:")
         for rank, idx in enumerate(idx_sorted[:top_n], 1):
             print(f"  {rank:>2}. Feature {idx:>2} → |coef| = {importance[idx]:.4f}")
         print()
